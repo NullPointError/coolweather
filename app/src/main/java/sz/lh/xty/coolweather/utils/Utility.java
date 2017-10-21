@@ -2,6 +2,8 @@ package sz.lh.xty.coolweather.utils;
 
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,6 +11,7 @@ import org.json.JSONObject;
 import sz.lh.xty.coolweather.db.City;
 import sz.lh.xty.coolweather.db.County;
 import sz.lh.xty.coolweather.db.Province;
+import sz.lh.xty.coolweather.gson.Weather;
 
 /**
  * Created by Administrator on 2017/10/21 0021.
@@ -49,13 +52,11 @@ public class Utility {
                     city.setProvinceId(provinceId);
                     city.save();
                 }
-                LogUtils.v("handleCityResponse","返回数据成功");
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        LogUtils.v("handleCityResponse","返回数据失败");
         return false;
     }
 
@@ -78,6 +79,19 @@ public class Utility {
             }
         }
         return false;
+    }
+
+    //将返回的JSON数据解析成Weather实体类
+    public static Weather handlerWeatherResponse(String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
+            String weatherContent = jsonArray.getJSONObject(0).toString();
+            return new Gson().fromJson(weatherContent, Weather.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
