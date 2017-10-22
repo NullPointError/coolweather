@@ -6,7 +6,7 @@ package sz.lh.xty.coolweather.gson;
 
 public class AQI {
 
-    public AQICity icity;
+    public AQICity city;
 
     public class AQICity {
 

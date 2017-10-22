@@ -9,10 +9,10 @@ import com.google.gson.annotations.SerializedName;
 public class Suggestion {
 
     @SerializedName("comf")
-    public String comfort;
+    public Comfort comfort;
 
     @SerializedName("cw")
-    public String carWash;
+    public CarWash carWash;
 
     public Sport sport;
 

@@ -2,10 +2,12 @@ package sz.lh.xty.coolweather.fragment;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +28,9 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 import sz.lh.xty.coolweather.Application.MyApplication;
+import sz.lh.xty.coolweather.MainActivity;
 import sz.lh.xty.coolweather.R;
+import sz.lh.xty.coolweather.WeatherActivity;
 import sz.lh.xty.coolweather.db.City;
 import sz.lh.xty.coolweather.db.County;
 import sz.lh.xty.coolweather.db.Province;
@@ -87,6 +91,20 @@ public class ChooseAreaFrangment extends Fragment {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(i);
                     queryCounties();
+                } else if (currentLevel == LEVEL_COUNTY) {
+                    String weatherId = countyList.get(i).getWeatherId();
+                    LogUtils.v("ChooseAreaFrangment：", " （onActivityCreated）getActivity的值为：" + getActivity());
+                    if (getActivity() instanceof MainActivity) {
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("weather_id", weatherId);
+                        startActivity(intent);
+                        getActivity().finish();
+                    } else if (getActivity() instanceof WeatherActivity) {
+                        WeatherActivity activity = (WeatherActivity) getActivity();
+                        activity.drawerLayout.closeDrawers();
+                        activity.swipeRefreshLayout.setRefreshing(true);
+                        activity.requestWeather(weatherId);
+                    }
                 }
             }
         });
@@ -126,11 +144,10 @@ public class ChooseAreaFrangment extends Fragment {
     private void queryCities() {
         titleText.setText(selectedProvince.getProvinceName());
         backButton.setVisibility(View.VISIBLE);
-        LogUtils.v("queryCities: ", "" + selectedProvince.getId());
+        LogUtils.v("ChooseAreaFrangment: ", "(queryCities)选取的城市ID为：" + selectedProvince.getId());
         cityList = DataSupport.where("provinceid = ?", String.valueOf(selectedProvince.getId())).find(City.class);
         if (cityList.size() > 0) {
             dataList.clear();
-            LogUtils.v("queryCities", "数据库有值，并从数据库中查询");
             for (City city : cityList) {
                 dataList.add(city.getCityName());
             }
